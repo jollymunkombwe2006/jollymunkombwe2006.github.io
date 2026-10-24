@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jolly's Adventure</title>
+<style>
+body{margin:0;background:linear-gradient(#87CEEB,#98FB98);font-family:Arial;text-align:center;overflow:hidden}
+h1{color:#ff4500;margin:10px;text-shadow:2px 2px #fff}
+#gameCanvas{border:4px solid #333;border-radius:10px;background:#fff}
+#score{font-size:20px;font-weight:bold;color:#333}
+button{padding:12px 25px;font-size:18px;background:#ff4500;color:white;border:none;border-radius:25px;margin:10px}
+</style>
+</head>
+<body>
+<h1>🏃‍♂️ JOLLY'S ADVENTURE 🌈</h1>
+<div id="score">Score: 0</div>
+<canvas id="gameCanvas" width="350" height="450"></canvas><br>
+<button onclick="jump()">JUMP ⬆️</button>
+<button onclick="startGame()">RESTART 🔄</button>
+<script>
+let canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
+let jolly={x:50,y:350,w:40,h:40,vy:0},gravity=0.6,jumpForce=-12,onGround=false,score=0,gameOver=false;
+let obstacles=[],frame=0;
+function startGame(){jolly.y=350;jolly.vy=0;obstacles=[];score=0;frame=0;gameOver=false;loop()}
+function jump(){if(onGround&&!gameOver){jolly.vy=jumpForce}}
+function loop(){
+if(gameOver)return;
+frame++;ctx.clearRect(0,0,350,450);
+ctx.fillStyle='#90EE90';ctx.fillRect(0,400,350,50);
+jolly.vy+=gravity;jolly.y+=jolly.vy;
+if(jolly.y>=350){jolly.y=350;jolly.vy=0;onGround=true}else onGround=false;
+ctx.fillStyle='#ff4500';ctx.fillRect(jolly.x,jolly.y,jolly.w,jolly.h);
+ctx.fillStyle='white';ctx.fillRect(jolly.x+10,jolly.y+10,8,8);ctx.fillRect(jolly.x+22,jolly.y+10,8,8);
+if(frame%90==0){obstacles.push({x:350,y:360,w:30,h:40})}
+for(let i=0;i<obstacles.length;i++){
+let o=obstacles[i];o.x-=4;ctx.fillStyle='#333';ctx.fillRect(o.x,o.y,o.w,o.h);
+if(jolly.x<jolly.y+o.w&&jolly.x+jolly.w>o.x&&jolly.y+jolly.h>o.y){gameOver=true;ctx.fillStyle='red';ctx.font='30px Arial';ctx.fillText('GAME OVER!',80,200);return}
+if(o.x+o.w<0){obstacles.splice(i,1);score++;document.getElementById('score').innerText='Score: '+score}
+}
+requestAnimationFrame(loop)}
+startGame();
+document.addEventListener('keydown',e=>{if(e.code=='Space')jump()});
+canvas.addEventListener('touchstart',jump);
+</script>
+</body>
+</html>
